@@ -692,6 +692,19 @@
       typeof option === 'string' ? option : option.name
     )
   : [];
+           productOptions.sort((a, b) => {
+  const order = {
+    color: 1,
+    colour: 1,
+    size: 2
+  };
+
+  const aKey = String(a).toLowerCase();
+  const bKey = String(b).toLowerCase();
+
+  return (order[aKey] || 99) - (order[bKey] || 99);
+});
+
 
       let optionMarkup = '';
 
