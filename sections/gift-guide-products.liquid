@@ -476,8 +476,10 @@
         (product.images && product.images.length ? product.images[0] : '');
 
       const productOptions = Array.isArray(product.options)
-        ? product.options
-        : [];
+  ? product.options.map(option =>
+      typeof option === 'string' ? option : option.name
+    )
+  : [];
 
       let optionMarkup = '';
 
