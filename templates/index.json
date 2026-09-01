@@ -13,9 +13,17 @@
       "type": "gift-guide-hero",
       "name": "Gift Guide Hero",
       "settings": {}
+    },
+    "gift_guide_products_3Vx6GL": {
+      "type": "gift-guide-products",
+      "name": "Gift Guide Products",
+      "settings": {
+        "heading": "Tisso vison in the wild"
+      }
     }
   },
   "order": [
-    "gift_guide_hero_kk4YHJ"
+    "gift_guide_hero_kk4YHJ",
+    "gift_guide_products_3Vx6GL"
   ]
 }
