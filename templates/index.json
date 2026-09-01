@@ -14,8 +14,54 @@
       "name": "Gift Guide Hero",
       "settings": {}
     },
-    "gift_guide_products_3Vx6GL": {
+    "gift_guide_products_99D3rG": {
       "type": "gift-guide-products",
+      "blocks": {
+        "product_Vwn3C4": {
+          "type": "product",
+          "settings": {
+            "product": ""
+          }
+        },
+        "product_UEFGXd": {
+          "type": "product",
+          "settings": {
+            "product": ""
+          }
+        },
+        "product_yUpLmL": {
+          "type": "product",
+          "settings": {
+            "product": ""
+          }
+        },
+        "product_jjtXNz": {
+          "type": "product",
+          "settings": {
+            "product": ""
+          }
+        },
+        "product_9Tfddw": {
+          "type": "product",
+          "settings": {
+            "product": ""
+          }
+        },
+        "product_UJNqFB": {
+          "type": "product",
+          "settings": {
+            "product": ""
+          }
+        }
+      },
+      "block_order": [
+        "product_Vwn3C4",
+        "product_UEFGXd",
+        "product_yUpLmL",
+        "product_jjtXNz",
+        "product_9Tfddw",
+        "product_UJNqFB"
+      ],
       "name": "Gift Guide Products",
       "settings": {
         "heading": "Tisso vison in the wild"
@@ -24,6 +70,6 @@
   },
   "order": [
     "gift_guide_hero_kk4YHJ",
-    "gift_guide_products_3Vx6GL"
+    "gift_guide_products_99D3rG"
   ]
 }
