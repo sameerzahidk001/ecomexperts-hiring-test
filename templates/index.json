@@ -14,53 +14,53 @@
       "name": "Gift Guide Hero",
       "settings": {}
     },
-    "gift_guide_products_99D3rG": {
+    "gift_guide_products_J6HP8p": {
       "type": "gift-guide-products",
       "blocks": {
-        "product_Vwn3C4": {
+        "product_FKxfnt": {
           "type": "product",
           "settings": {
-            "product": ""
+            "product": "black-leather-bag"
           }
         },
-        "product_UEFGXd": {
+        "product_YrhqPp": {
           "type": "product",
           "settings": {
-            "product": ""
+            "product": "blue-silk-tuxedo"
           }
         },
-        "product_yUpLmL": {
+        "product_ewFat3": {
           "type": "product",
           "settings": {
-            "product": ""
+            "product": "chequered-red-shirt"
           }
         },
-        "product_jjtXNz": {
+        "product_gVF4YR": {
           "type": "product",
           "settings": {
-            "product": ""
+            "product": "classic-leather-jacket"
           }
         },
-        "product_9Tfddw": {
+        "product_K8EHmA": {
           "type": "product",
           "settings": {
-            "product": ""
+            "product": "classic-varsity-top"
           }
         },
-        "product_UJNqFB": {
+        "product_ehG8DB": {
           "type": "product",
           "settings": {
-            "product": ""
+            "product": "dark-denim-top"
           }
         }
       },
       "block_order": [
-        "product_Vwn3C4",
-        "product_UEFGXd",
-        "product_yUpLmL",
-        "product_jjtXNz",
-        "product_9Tfddw",
-        "product_UJNqFB"
+        "product_FKxfnt",
+        "product_YrhqPp",
+        "product_ewFat3",
+        "product_gVF4YR",
+        "product_K8EHmA",
+        "product_ehG8DB"
       ],
       "name": "Gift Guide Products",
       "settings": {
@@ -70,6 +70,6 @@
   },
   "order": [
     "gift_guide_hero_kk4YHJ",
-    "gift_guide_products_99D3rG"
+    "gift_guide_products_J6HP8p"
   ]
 }
