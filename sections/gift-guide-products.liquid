@@ -1,8 +1,282 @@
-<section class="gift-guide-products">
-  <div class="gift-guide-products__inner">
-    <h2>{{ section.settings.heading }}</h2>
+<section id="GiftGuideProducts-{{ section.id }}" class="gift-products">
+  <div class="gift-products__inner">
+    <h2 class="gift-products__heading">{{ section.settings.heading }}</h2>
+
+    <div class="gift-products__grid">
+      {% for block in section.blocks %}
+        {% assign product = block.settings.product %}
+
+        {% if product != blank %}
+          <button
+            type="button"
+            class="gift-product-card"
+            data-product-card
+            data-product-handle="{{ product.handle }}"
+            {{ block.shopify_attributes }}
+          >
+            <div class="gift-product-card__image-wrap">
+              {% if product.featured_image %}
+                {{
+                  product.featured_image
+                  | image_url: width: 900
+                  | image_tag:
+                    loading: 'lazy',
+                    class: 'gift-product-card__image'
+                }}
+              {% endif %}
+
+              <span class="gift-product-card__plus">+</span>
+            </div>
+          </button>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="gift-product-modal" data-product-modal hidden>
+    <div class="gift-product-modal__overlay" data-modal-close></div>
+
+    <div class="gift-product-modal__dialog" role="dialog" aria-modal="true">
+      <button
+        type="button"
+        class="gift-product-modal__close"
+        data-modal-close
+        aria-label="Close"
+      >
+        ×
+      </button>
+
+      <div data-modal-content></div>
+    </div>
   </div>
 </section>
+
+<style>
+  #GiftGuideProducts-{{ section.id }} {
+    padding: 40px 20px 70px;
+    background: #fff;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gift-products__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gift-products__heading {
+    margin: 0 0 28px;
+    font-size: 28px;
+    line-height: 1.2;
+    font-weight: 400;
+    color: #111;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gift-products__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gift-product-card {
+    display: block;
+    position: relative;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    overflow: hidden;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gift-product-card__image-wrap {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: #f5f5f5;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gift-product-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gift-product-card__plus {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #fff;
+    color: #111;
+    font-size: 20px;
+    line-height: 1;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gift-product-modal[hidden] {
+    display: none;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gift-product-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gift-product-modal__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gift-product-modal__dialog {
+    position: relative;
+    z-index: 2;
+    width: min(520px, 100%);
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #fff;
+    padding: 24px;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gift-product-modal__close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    border: 0;
+    background: transparent;
+    font-size: 30px;
+    cursor: pointer;
+    z-index: 3;
+  }
+
+  @media screen and (max-width: 749px) {
+    #GiftGuideProducts-{{ section.id }} {
+      padding: 28px 16px 50px;
+    }
+
+    #GiftGuideProducts-{{ section.id }} .gift-products__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+    }
+
+    #GiftGuideProducts-{{ section.id }} .gift-products__heading {
+      font-size: 24px;
+    }
+  }
+</style>
+
+<script>
+  (() => {
+    const section = document.querySelector('#GiftGuideProducts-{{ section.id }}');
+    if (!section) return;
+
+    const modal = section.querySelector('[data-product-modal]');
+    const modalContent = section.querySelector('[data-modal-content]');
+
+    section.querySelectorAll('[data-product-card]').forEach((card) => {
+      card.addEventListener('click', async () => {
+        const handle = card.dataset.productHandle;
+
+        try {
+          const response = await fetch(`/products/${handle}.js`);
+          const product = await response.json();
+
+          modalContent.innerHTML = `
+            <div class="gift-modal-product">
+              <img
+                src="${product.featured_image}"
+                alt="${product.title}"
+                style="width:100%;height:auto;display:block;margin-bottom:20px;"
+              >
+
+              <h3 style="margin:0 0 10px;font-size:24px;">
+                ${product.title}
+              </h3>
+
+              <p style="margin:0 0 20px;font-size:18px;">
+                ${(product.price / 100).toLocaleString(undefined, {
+                  style: 'currency',
+                  currency: '{{ cart.currency.iso_code | default: shop.currency }}'
+                })}
+              </p>
+
+              <form data-product-form>
+                <label style="display:block;margin-bottom:8px;">Choose option</label>
+
+                <select
+                  name="id"
+                  style="width:100%;padding:12px;margin-bottom:20px;"
+                >
+                  ${product.variants.map(variant => `
+                    <option
+                      value="${variant.id}"
+                      ${variant.available ? '' : 'disabled'}
+                    >
+                      ${variant.title}
+                    </option>
+                  `).join('')}
+                </select>
+
+                <button
+                  type="submit"
+                  style="
+                    width:100%;
+                    padding:15px 20px;
+                    border:0;
+                    background:#000;
+                    color:#fff;
+                    cursor:pointer;
+                    text-transform:uppercase;
+                  "
+                >
+                  Add to cart →
+                </button>
+              </form>
+            </div>
+          `;
+
+          modal.hidden = false;
+          document.body.style.overflow = 'hidden';
+
+          const form = modalContent.querySelector('[data-product-form]');
+
+          form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(form);
+
+            const addResponse = await fetch('/cart/add.js', {
+              method: 'POST',
+              headers: {
+                'Accept': 'application/json'
+              },
+              body: formData
+            });
+
+            if (addResponse.ok) {
+              window.location.href = '/cart';
+            }
+          });
+        } catch (error) {
+          console.error(error);
+        }
+      });
+    });
+
+    section.querySelectorAll('[data-modal-close]').forEach((button) => {
+      button.addEventListener('click', () => {
+        modal.hidden = true;
+        document.body.style.overflow = '';
+      });
+    });
+  })();
+</script>
 
 {% schema %}
 {
@@ -15,9 +289,31 @@
       "default": "Tisso vison in the wild"
     }
   ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 6,
   "presets": [
     {
-      "name": "Gift Guide Products"
+      "name": "Gift Guide Products",
+      "blocks": [
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" }
+      ]
     }
   ]
 }
