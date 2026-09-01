@@ -1,31 +1,38 @@
-<section id="GiftGuideProducts-{{ section.id }}" class="gift-products">
-  <div class="gift-products__inner">
-    <h2 class="gift-products__heading">{{ section.settings.heading }}</h2>
+<section id="GiftGuideProducts-{{ section.id }}" class="gg-products">
+  <div class="gg-products__container">
+    {% if section.settings.heading != blank %}
+      <h2 class="gg-products__heading">
+        {{ section.settings.heading }}
+      </h2>
+    {% endif %}
 
-    <div class="gift-products__grid">
+    <div class="gg-products__grid">
       {% for block in section.blocks %}
         {% assign product = block.settings.product %}
 
         {% if product != blank %}
           <button
             type="button"
-            class="gift-product-card"
-            data-product-card
-            data-product-handle="{{ product.handle }}"
+            class="gg-product"
+            data-product-trigger
+            data-handle="{{ product.handle }}"
             {{ block.shopify_attributes }}
           >
-            <div class="gift-product-card__image-wrap">
-              {% if product.featured_image %}
+            <div class="gg-product__media">
+              {% if product.featured_image != blank %}
                 {{
                   product.featured_image
-                  | image_url: width: 900
+                  | image_url: width: 1000
                   | image_tag:
                     loading: 'lazy',
-                    class: 'gift-product-card__image'
+                    class: 'gg-product__image',
+                    alt: product.title
                 }}
               {% endif %}
 
-              <span class="gift-product-card__plus">+</span>
+              <span class="gg-product__hotspot" aria-hidden="true">
+                +
+              </span>
             </div>
           </button>
         {% endif %}
@@ -33,248 +40,681 @@
     </div>
   </div>
 
-  <div class="gift-product-modal" data-product-modal hidden>
-    <div class="gift-product-modal__overlay" data-modal-close></div>
+  <div class="gg-modal" data-gg-modal hidden>
+    <button
+      type="button"
+      class="gg-modal__backdrop"
+      data-gg-close
+      aria-label="Close product"
+    ></button>
 
-    <div class="gift-product-modal__dialog" role="dialog" aria-modal="true">
+    <div
+      class="gg-modal__box"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Product details"
+    >
       <button
         type="button"
-        class="gift-product-modal__close"
-        data-modal-close
+        class="gg-modal__close"
+        data-gg-close
         aria-label="Close"
       >
         ×
       </button>
 
-      <div data-modal-content></div>
+      <div class="gg-modal__content" data-gg-content>
+        <div class="gg-modal__loading">Loading...</div>
+      </div>
     </div>
   </div>
 </section>
 
 <style>
   #GiftGuideProducts-{{ section.id }} {
-    padding: 40px 20px 70px;
-    background: #fff;
+    background: #ffffff;
+    padding: 34px 24px 70px;
   }
 
-  #GiftGuideProducts-{{ section.id }} .gift-products__inner {
+  #GiftGuideProducts-{{ section.id }} * {
+    box-sizing: border-box;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gg-products__container {
+    width: 100%;
     max-width: 1200px;
     margin: 0 auto;
   }
 
-  #GiftGuideProducts-{{ section.id }} .gift-products__heading {
-    margin: 0 0 28px;
-    font-size: 28px;
+  #GiftGuideProducts-{{ section.id }} .gg-products__heading {
+    margin: 0 0 26px;
+    color: #111;
+    font-size: 26px;
     line-height: 1.2;
     font-weight: 400;
-    color: #111;
   }
 
-  #GiftGuideProducts-{{ section.id }} .gift-products__grid {
+  #GiftGuideProducts-{{ section.id }} .gg-products__grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
   }
 
-  #GiftGuideProducts-{{ section.id }} .gift-product-card {
+  #GiftGuideProducts-{{ section.id }} .gg-product {
+    appearance: none;
     display: block;
-    position: relative;
+    width: 100%;
+    margin: 0;
     padding: 0;
     border: 0;
     background: transparent;
     cursor: pointer;
-    overflow: hidden;
   }
 
-  #GiftGuideProducts-{{ section.id }} .gift-product-card__image-wrap {
+  #GiftGuideProducts-{{ section.id }} .gg-product__media {
     position: relative;
+    width: 100%;
     aspect-ratio: 1 / 1;
     overflow: hidden;
-    background: #f5f5f5;
+    background: #f4f4f4;
   }
 
-  #GiftGuideProducts-{{ section.id }} .gift-product-card__image {
+  #GiftGuideProducts-{{ section.id }} .gg-product__image {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
+    transition: transform .25s ease;
   }
 
-  #GiftGuideProducts-{{ section.id }} .gift-product-card__plus {
+  #GiftGuideProducts-{{ section.id }} .gg-product:hover .gg-product__image {
+    transform: scale(1.02);
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gg-product__hotspot {
     position: absolute;
-    right: 16px;
     top: 16px;
+    right: 16px;
     width: 28px;
     height: 28px;
     border-radius: 50%;
     display: grid;
     place-items: center;
-    background: #fff;
+    background: rgba(255,255,255,.85);
     color: #111;
     font-size: 20px;
+    font-weight: 300;
     line-height: 1;
   }
 
-  #GiftGuideProducts-{{ section.id }} .gift-product-modal[hidden] {
-    display: none;
+  /* MODAL */
+  #GiftGuideProducts-{{ section.id }} .gg-modal[hidden] {
+    display: none !important;
   }
 
-  #GiftGuideProducts-{{ section.id }} .gift-product-modal {
+  #GiftGuideProducts-{{ section.id }} .gg-modal {
     position: fixed;
     inset: 0;
-    z-index: 9999;
-    display: grid;
-    place-items: center;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 20px;
   }
 
-  #GiftGuideProducts-{{ section.id }} .gift-product-modal__overlay {
+  #GiftGuideProducts-{{ section.id }} .gg-modal__backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(0,0,0,.45);
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: rgba(0,0,0,.42);
+    cursor: default;
   }
 
-  #GiftGuideProducts-{{ section.id }} .gift-product-modal__dialog {
+  #GiftGuideProducts-{{ section.id }} .gg-modal__box {
     position: relative;
     z-index: 2;
-    width: min(520px, 100%);
+    width: min(620px, 100%);
     max-height: 90vh;
     overflow-y: auto;
     background: #fff;
-    padding: 24px;
+    box-shadow: 0 15px 45px rgba(0,0,0,.18);
   }
 
-  #GiftGuideProducts-{{ section.id }} .gift-product-modal__close {
+  #GiftGuideProducts-{{ section.id }} .gg-modal__close {
     position: absolute;
-    top: 10px;
+    top: 8px;
     right: 12px;
+    z-index: 5;
+    width: 32px;
+    height: 32px;
+    padding: 0;
     border: 0;
     background: transparent;
-    font-size: 30px;
+    color: #111;
+    font-size: 27px;
+    line-height: 1;
     cursor: pointer;
-    z-index: 3;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gg-popup {
+    display: grid;
+    grid-template-columns: 48% 52%;
+    min-height: 360px;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gg-popup__media {
+    min-height: 360px;
+    background: #f5f5f5;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gg-popup__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 360px;
+    object-fit: cover;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gg-popup__info {
+    padding: 40px 28px 26px;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gg-popup__title {
+    margin: 0 0 9px;
+    font-size: 18px;
+    line-height: 1.2;
+    font-weight: 500;
+    color: #111;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gg-popup__price {
+    margin: 0 0 15px;
+    font-size: 16px;
+    line-height: 1.2;
+    color: #111;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gg-popup__description {
+    margin: 0 0 20px;
+    color: #333;
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gg-popup__description p {
+    margin: 0;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gg-option {
+    margin-bottom: 16px;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gg-option__label {
+    display: block;
+    margin-bottom: 7px;
+    color: #111;
+    font-size: 12px;
+    line-height: 1.2;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gg-option__values {
+    display: flex;
+    width: 100%;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gg-choice {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gg-choice input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gg-choice span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 38px;
+    padding: 8px 10px;
+    border: 1px solid #111;
+    border-right: 0;
+    background: #fff;
+    color: #111;
+    font-size: 11px;
+    cursor: pointer;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gg-choice:last-child span {
+    border-right: 1px solid #111;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gg-choice input:checked + span {
+    background: #111;
+    color: #fff;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gg-choice input:disabled + span {
+    opacity: .35;
+    cursor: not-allowed;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gg-select {
+    width: 100%;
+    height: 40px;
+    padding: 0 36px 0 12px;
+    border: 1px solid #111;
+    border-radius: 0;
+    background: #fff;
+    color: #111;
+    font-size: 12px;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gg-add {
+    width: 100%;
+    min-height: 44px;
+    margin-top: 4px;
+    padding: 11px 18px;
+    border: 0;
+    background: #000;
+    color: #fff;
+    font-size: 12px;
+    line-height: 1;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gg-add:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+  }
+
+  #GiftGuideProducts-{{ section.id }} .gg-message {
+    min-height: 18px;
+    margin-top: 10px;
+    font-size: 11px;
   }
 
   @media screen and (max-width: 749px) {
     #GiftGuideProducts-{{ section.id }} {
-      padding: 28px 16px 50px;
+      padding: 26px 14px 45px;
     }
 
-    #GiftGuideProducts-{{ section.id }} .gift-products__grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 6px;
+    #GiftGuideProducts-{{ section.id }} .gg-products__heading {
+      margin-bottom: 16px;
+      font-size: 20px;
     }
 
-    #GiftGuideProducts-{{ section.id }} .gift-products__heading {
-      font-size: 24px;
+    #GiftGuideProducts-{{ section.id }} .gg-products__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 5px;
+    }
+
+    #GiftGuideProducts-{{ section.id }} .gg-product__hotspot {
+      top: 10px;
+      right: 10px;
+      width: 24px;
+      height: 24px;
+      font-size: 17px;
+    }
+
+    #GiftGuideProducts-{{ section.id }} .gg-modal {
+      padding: 15px;
+    }
+
+    #GiftGuideProducts-{{ section.id }} .gg-modal__box {
+      width: min(390px, 100%);
+    }
+
+    #GiftGuideProducts-{{ section.id }} .gg-popup {
+      grid-template-columns: 1fr;
+    }
+
+    #GiftGuideProducts-{{ section.id }} .gg-popup__media,
+    #GiftGuideProducts-{{ section.id }} .gg-popup__image {
+      min-height: 260px;
+      height: 260px;
+    }
+
+    #GiftGuideProducts-{{ section.id }} .gg-popup__info {
+      padding: 24px 20px 22px;
     }
   }
 </style>
 
 <script>
   (() => {
-    const section = document.querySelector('#GiftGuideProducts-{{ section.id }}');
-    if (!section) return;
+    const section = document.getElementById('GiftGuideProducts-{{ section.id }}');
 
-    const modal = section.querySelector('[data-product-modal]');
-    const modalContent = section.querySelector('[data-modal-content]');
+    if (!section || section.dataset.ggReady === 'true') return;
+    section.dataset.ggReady = 'true';
 
-    section.querySelectorAll('[data-product-card]').forEach((card) => {
-      card.addEventListener('click', async () => {
-        const handle = card.dataset.productHandle;
+    const modal = section.querySelector('[data-gg-modal]');
+    const content = section.querySelector('[data-gg-content]');
+
+    if (!modal || !content) return;
+
+    const moneyFormat = (cents) => {
+      try {
+        return new Intl.NumberFormat(undefined, {
+          style: 'currency',
+          currency: '{{ cart.currency.iso_code | default: shop.currency }}'
+        }).format(cents / 100);
+      } catch (error) {
+        return '$' + (cents / 100).toFixed(2);
+      }
+    };
+
+    const escapeHTML = (value = '') => {
+      const div = document.createElement('div');
+      div.textContent = value;
+      return div.innerHTML;
+    };
+
+    const openModal = () => {
+      modal.hidden = false;
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+    };
+
+    const closeModal = () => {
+      modal.hidden = true;
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+      content.innerHTML = '<div class="gg-modal__loading">Loading...</div>';
+    };
+
+    section.querySelectorAll('[data-gg-close]').forEach((el) => {
+      el.addEventListener('click', closeModal);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !modal.hidden) {
+        closeModal();
+      }
+    });
+
+    section.querySelectorAll('[data-product-trigger]').forEach((trigger) => {
+      trigger.addEventListener('click', async () => {
+        const handle = trigger.dataset.handle;
+
+        if (!handle) return;
+
+        openModal();
 
         try {
           const response = await fetch(`/products/${handle}.js`);
+
+          if (!response.ok) {
+            throw new Error('Product could not be loaded.');
+          }
+
           const product = await response.json();
 
-          modalContent.innerHTML = `
-            <div class="gift-modal-product">
-              <img
-                src="${product.featured_image}"
-                alt="${product.title}"
-                style="width:100%;height:auto;display:block;margin-bottom:20px;"
-              >
-
-              <h3 style="margin:0 0 10px;font-size:24px;">
-                ${product.title}
-              </h3>
-
-              <p style="margin:0 0 20px;font-size:18px;">
-                ${(product.price / 100).toLocaleString(undefined, {
-                  style: 'currency',
-                  currency: '{{ cart.currency.iso_code | default: shop.currency }}'
-                })}
-              </p>
-
-              <form data-product-form>
-                <label style="display:block;margin-bottom:8px;">Choose option</label>
-
-                <select
-                  name="id"
-                  style="width:100%;padding:12px;margin-bottom:20px;"
-                >
-                  ${product.variants.map(variant => `
-                    <option
-                      value="${variant.id}"
-                      ${variant.available ? '' : 'disabled'}
-                    >
-                      ${variant.title}
-                    </option>
-                  `).join('')}
-                </select>
-
-                <button
-                  type="submit"
-                  style="
-                    width:100%;
-                    padding:15px 20px;
-                    border:0;
-                    background:#000;
-                    color:#fff;
-                    cursor:pointer;
-                    text-transform:uppercase;
-                  "
-                >
-                  Add to cart →
-                </button>
-              </form>
+          renderProduct(product);
+        } catch (error) {
+          content.innerHTML = `
+            <div style="padding:40px;">
+              Unable to load product.
             </div>
           `;
 
-          modal.hidden = false;
-          document.body.style.overflow = 'hidden';
-
-          const form = modalContent.querySelector('[data-product-form]');
-
-          form.addEventListener('submit', async (event) => {
-            event.preventDefault();
-
-            const formData = new FormData(form);
-
-            const addResponse = await fetch('/cart/add.js', {
-              method: 'POST',
-              headers: {
-                'Accept': 'application/json'
-              },
-              body: formData
-            });
-
-            if (addResponse.ok) {
-              window.location.href = '/cart';
-            }
-          });
-        } catch (error) {
           console.error(error);
         }
       });
     });
 
-    section.querySelectorAll('[data-modal-close]').forEach((button) => {
-      button.addEventListener('click', () => {
-        modal.hidden = true;
-        document.body.style.overflow = '';
+    function renderProduct(product) {
+      const image =
+        product.featured_image ||
+        (product.images && product.images.length ? product.images[0] : '');
+
+      const productOptions = Array.isArray(product.options)
+        ? product.options
+        : [];
+
+      let optionMarkup = '';
+
+      productOptions.forEach((optionName, optionIndex) => {
+        const optionNumber = optionIndex + 1;
+
+        const values = [
+          ...new Set(
+            product.variants
+              .map((variant) => variant[`option${optionNumber}`])
+              .filter(Boolean)
+          )
+        ];
+
+        /*
+          Color-like options are rendered as buttons.
+          Other options such as Size use a select.
+        */
+        if (/color|colour/i.test(optionName)) {
+          optionMarkup += `
+            <div class="gg-option" data-option-index="${optionIndex}">
+              <span class="gg-option__label">
+                ${escapeHTML(optionName)}
+              </span>
+
+              <div class="gg-option__values">
+                ${values.map((value, valueIndex) => `
+                  <label class="gg-choice">
+                    <input
+                      type="radio"
+                      name="option-${optionIndex}"
+                      value="${escapeHTML(value)}"
+                      ${valueIndex === 0 ? 'checked' : ''}
+                    >
+                    <span>${escapeHTML(value)}</span>
+                  </label>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        } else {
+          optionMarkup += `
+            <div class="gg-option" data-option-index="${optionIndex}">
+              <label class="gg-option__label">
+                ${escapeHTML(optionName)}
+              </label>
+
+              <select
+                class="gg-select"
+                name="option-${optionIndex}"
+              >
+                ${values.map((value) => `
+                  <option value="${escapeHTML(value)}">
+                    ${escapeHTML(value)}
+                  </option>
+                `).join('')}
+              </select>
+            </div>
+          `;
+        }
       });
-    });
+
+      content.innerHTML = `
+        <div class="gg-popup">
+          <div class="gg-popup__media">
+            ${
+              image
+                ? `<img
+                    src="${image}"
+                    alt="${escapeHTML(product.title)}"
+                    class="gg-popup__image"
+                  >`
+                : ''
+            }
+          </div>
+
+          <div class="gg-popup__info">
+            <h3 class="gg-popup__title">
+              ${escapeHTML(product.title)}
+            </h3>
+
+            <div class="gg-popup__price" data-gg-price>
+              ${moneyFormat(product.price)}
+            </div>
+
+            ${
+              product.description
+                ? `<div class="gg-popup__description">
+                    ${product.description}
+                  </div>`
+                : ''
+            }
+
+            <form data-gg-form>
+              ${optionMarkup}
+
+              <input
+                type="hidden"
+                name="id"
+                value=""
+                data-variant-id
+              >
+
+              <button
+                type="submit"
+                class="gg-add"
+                data-add-button
+              >
+                Add to cart →
+              </button>
+
+              <div class="gg-message" data-message></div>
+            </form>
+          </div>
+        </div>
+      `;
+
+      const form = content.querySelector('[data-gg-form]');
+      const variantInput = content.querySelector('[data-variant-id]');
+      const priceEl = content.querySelector('[data-gg-price]');
+      const addButton = content.querySelector('[data-add-button]');
+      const message = content.querySelector('[data-message]');
+
+      const optionControls = [
+        ...form.querySelectorAll(
+          '.gg-option input:checked, .gg-option select'
+        )
+      ];
+
+      function selectedOptions() {
+        return productOptions.map((_, index) => {
+          const checked = form.querySelector(
+            `input[name="option-${index}"]:checked`
+          );
+
+          const select = form.querySelector(
+            `select[name="option-${index}"]`
+          );
+
+          return checked ? checked.value : select ? select.value : null;
+        });
+      }
+
+      function updateVariant() {
+        const chosen = selectedOptions();
+
+        const variant = product.variants.find((item) => {
+          return chosen.every((value, index) => {
+            return item[`option${index + 1}`] === value;
+          });
+        });
+
+        if (!variant) {
+          variantInput.value = '';
+          addButton.disabled = true;
+          addButton.textContent = 'Unavailable';
+          return;
+        }
+
+        variantInput.value = variant.id;
+
+        if (priceEl) {
+          priceEl.textContent = moneyFormat(variant.price);
+        }
+
+        if (variant.available) {
+          addButton.disabled = false;
+          addButton.textContent = 'Add to cart →';
+        } else {
+          addButton.disabled = true;
+          addButton.textContent = 'Sold out';
+        }
+      }
+
+      form
+        .querySelectorAll('input[type="radio"], select')
+        .forEach((control) => {
+          control.addEventListener('change', updateVariant);
+        });
+
+      updateVariant();
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        if (!variantInput.value) return;
+
+        addButton.disabled = true;
+        addButton.textContent = 'Adding...';
+        message.textContent = '';
+
+        try {
+          const response = await fetch('/cart/add.js', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json'
+            },
+            body: JSON.stringify({
+              items: [
+                {
+                  id: Number(variantInput.value),
+                  quantity: 1
+                }
+              ]
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error('Could not add to cart.');
+          }
+
+          message.textContent = 'Added to cart.';
+          addButton.textContent = 'Added ✓';
+
+          /*
+            Refresh cart state after adding.
+          */
+          document.documentElement.dispatchEvent(
+            new CustomEvent('cart:refresh', {
+              bubbles: true
+            })
+          );
+
+          setTimeout(() => {
+            closeModal();
+          }, 700);
+
+        } catch (error) {
+          message.textContent = 'Unable to add this product.';
+          addButton.disabled = false;
+          addButton.textContent = 'Add to cart →';
+
+          console.error(error);
+        }
+      });
+    }
   })();
 </script>
 
