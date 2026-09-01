@@ -1,0 +1,24 @@
+<section class="gift-guide-products">
+  <div class="gift-guide-products__inner">
+    <h2>{{ section.settings.heading }}</h2>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Gift Guide Products",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Tisso vison in the wild"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Gift Guide Products"
+    }
+  ]
+}
+{% endschema %}

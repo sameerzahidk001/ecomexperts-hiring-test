@@ -1,29 +1,40 @@
-<section class="gift-guide-hero">
+<section class="gift-guide">
+  <img
+    src="{{ 'gift-guide-hero.svg' | asset_url }}"
+    alt=""
+    class="gift-guide__topbar"
+    width="1440"
+    height="64"
+  >
+
   <img
     src="{{ 'gift-guide-artwork.svg' | asset_url }}"
     alt="The Gift Guide"
-    class="gift-guide-hero__artwork"
+    class="gift-guide__artwork"
     width="1440"
     height="780"
   >
 </section>
 
 <style>
-  .gift-guide-hero {
+  .gift-guide {
     width: 100%;
     margin: 0;
     padding: 0;
     overflow: hidden;
+    background: #fff;
   }
 
-  .gift-guide-hero__artwork {
+  .gift-guide__topbar,
+  .gift-guide__artwork {
     display: block;
     width: 100%;
     height: auto;
   }
 
   @media screen and (max-width: 749px) {
-    .gift-guide-hero__artwork {
+    .gift-guide__topbar,
+    .gift-guide__artwork {
       width: 100%;
       height: auto;
     }
